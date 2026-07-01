@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malik Surgical Hospital - Lab Report Software</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%); color: #333; min-height: 100vh; }
+        .navbar { background: linear-gradient(90deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { font-size: 28px; margin-bottom: 5px; }
+        .navbar p { font-size: 12px; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .menu-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .btn { padding: 15px 25px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(21,101,192,0.4); }
+        .btn-secondary { background: white; color: #1565c0; border: 2px solid #1565c0; }
+        .btn-secondary:hover { background: #e3f2fd; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .section { display: none; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .section.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #1565c0; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 5px rgba(21,101,192,0.2); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .test-list { border: 1px solid #ddd; border-radius: 5px; max-height: 300px; overflow-y: auto; padding: 10px; }
+        .test-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 3px; transition: all 0.2s; }
+        .test-item:hover { background: #e3f2fd; }
+        .test-item input { margin-right: 10px; width: auto; }
+        .test-item label { display: inline; margin: 0; }
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .results-table th { background: #1565c0; color: white; padding: 12px; text-align: left; font-size: 14px; }
+        .results-table td { padding: 12px; border-bottom: 1px solid #ddd; font-size: 13px; }
+        .results-table tr:hover { background: #f5f5f5; }
+        .report-preview { background: #f9f9f9; border: 1px solid #ddd; padding: 30px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin-top: 20px; }
+        .report-header { text-align: center; border-bottom: 2px solid #1565c0; padding-bottom: 20px; margin-bottom: 20px; }
+        .report-section { margin-bottom: 20px; }
+        .report-section h5 { color: #1565c0; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal.active { display: block; }
+        .modal-content { background-color: white; padding: 30px; margin: 20px auto; border-radius: 10px; max-width: 900px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .close-btn { float: right; font-size: 28px; font-weight: bold; color: #aaa; cursor: pointer; }
+        .close-btn:hover { color: #000; }
+        .no-reports { text-align: center; padding: 40px; color: #999; }
+        .report-item { background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-left: 4px solid #1565c0; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+        .report-item:hover { background: #e3f2fd; transform: translateX(5px); }
+        .report-item-title { font-weight: 600; color: #1565c0; }
+        .report-item-info { font-size: 13px; color: #666; margin-top: 5px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .btn-group .btn { flex: 1; min-width: 100px; }
+        @media print { body { background: white; } .navbar, .menu-buttons, .btn-group, .close-btn { display: none; } .report-preview { box-shadow: none; border: none; } }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .menu-buttons { grid-template-columns: 1fr; } .btn-group { flex-direction: column; } .btn-group .btn { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>MALIK SURGICAL HOSPITAL</h1>
+        <p>LABORATOR & DIAGNOSTIC CENTER</p>
+        <p>Mandi Ahmadabad | Ph: +923207307162</p>
+    </div>
+
+    <div class="container">
+        <div class="menu-buttons">
+            <button class="btn btn-primary" onclick="showSection('home')">HOME</button>
+            <button class="btn btn-primary" onclick="showSection('newReport')">NEW REPORT</button>
+            <button class="btn btn-primary" onclick="showSection('viewReports')">VIEW REPORTS</button>
+            <button class="btn btn-primary" onclick="showSection('settings')">SETTINGS</button>
+        </div>
+
+        <div id="home" class="section active">
+            <h2>Welcome to Lab Software</h2>
+            <p style="margin-top: 20px; line-height: 1.8;">
+                <strong>MALIK SURGICAL HOSPITAL - Laboratory Management System</strong><br><br>
+                This software helps you create and manage laboratory reports efficiently.<br><br>
+                <strong>Features:</strong><br>
+                ✓ Create new patient reports<br>
+                ✓ Select from 50+ laboratory tests<br>
+                ✓ Enter test results and values<br>
+                ✓ View and search all reports<br>
+                ✓ Print professional reports<br>
+                ✓ Manage hospital settings<br><br>
+                All data is saved and persists across sessions.
+            </p>
+        </div>
+
+        <div id="newReport" class="section">
+            <h2>Create New Report</h2>
+            <div id="reportAlert"></div>
+            <div class="form-row">
+                <div>
+                    <div class="form-group">
+                        <label>Patient Name *</label>
+                        <input type="text" id="patientName" placeholder="Enter patient name">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="patientAge" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="patientGender"><option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option></select>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="patientPhone" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Doctor Name</label>
+                        <input type="text" id="patientDoctor" placeholder="Enter doctor name">
+                    </div>
+                    <div class="form-group">
+                        <label>Lab Number</label>
+                        <input type="text" id="labNumber" placeholder="Enter lab number">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Select Tests (Scroll to see more)</label>
+                <div class="test-list" id="testList"></div>
+            </div>
+            <button class="btn btn-success" onclick="createReport()">CREATE REPORT</button>
+            <button class="btn btn-secondary" onclick="resetForm()">CLEAR</button>
+        </div>
+
+        <div id="viewReports" class="section">
+            <h2>All Reports</h2>
+            <div class="form-group">
+                <input type="text" id="searchInput" placeholder="Search by patient name or phone..." onkeyup="searchReports()">
+            </div>
+            <div id="reportsList"></div>
+        </div>
+
+        <div id="settings" class="section">
+            <h2>Settings</h2>
+            <div class="form-group">
+                <label>Hospital Name</label>
+                <input type="text" id="hospitalName" placeholder="Hospital Name">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="hospitalAddress" placeholder="Address">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone 1</label>
+                    <input type="tel" id="hospitalPhone1" placeholder="Phone 1">
+                </div>
+                <div class="form-group">
+                    <label>Phone 2</label>
+                    <input type="tel" id="hospitalPhone2" placeholder="Phone 2">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="hospitalEmail" placeholder="Email">
+            </div>
+            <button class="btn btn-success" onclick="saveSettings()">SAVE SETTINGS</button>
+            <button class="btn btn-danger" onclick="clearAllData()">CLEAR ALL DATA</button>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="reportContent"></div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="printReport()">PRINT</button>
+                <button class="btn btn-secondary" onclick="closeModal()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testDatabase = [
+            {id:1,code:'CBC-HB',name:'Hemoglobin (Hb)',category:'HEMATOLOGY',unit:'g/dL',range:'M:13.5-17.5 F:12.0-15.5'},
+            {id:2,code:'CBC-RBC',name:'RBC Count',category:'HEMATOLOGY',unit:'million/µL',range:'M:4.5-5.9 F:4.0-5.2'},
+            {id:3,code:'CBC-WBC',name:'WBC Count',category:'HEMATOLOGY',unit:'/µL',range:'4000-11000'},
+            {id:4,code:'CBC-HCT',name:'Hematocrit (PCV)',category:'HEMATOLOGY',unit:'%',range:'M:41-53 F:36-46'},
+            {id:5,code:'CBC-PLT',name:'Platelet Count',category:'HEMATOLOGY',unit:'/µL',range:'150000-450000'},
+            {id:6,code:'BG-ABO',name:'Blood Group ABO',category:'HEMATOLOGY',unit:'',range:'A/B/AB/O'},
+            {id:7,code:'BG-RH',name:'Rh Factor',category:'HEMATOLOGY',unit:'',range:'Positive/Negative'},
+            {id:8,code:'ESR',name:'ESR',category:'HEMATOLOGY',unit:'mm/hr',range:'M:0-15 F:0-20'},
+            {id:9,code:'PT',name:'Prothrombin Time',category:'HEMATOLOGY',unit:'seconds',range:'11-13.5'},
+            {id:10,code:'FBS',name:'Fasting Blood Sugar',category:'BIOCHEMISTRY',unit:'mg/dL',range:'70-100'},
+            {id:11,code:'RBS',name:'Random Blood Sugar',category:'BIOCHEMISTRY',unit:'mg/dL',range:'<140'},
+            {id:12,code:'HbA1c',name:'HbA1c',category:'BIOCHEMISTRY',unit:'%',range:'<5.7'},
+            {id:13,code:'BIL-T',name:'Total Bilirubin',category:'BIOCHEMISTRY',unit:'mg/dL',range:'0.3-1.2'},
+            {id:14,code:'BIL-D',name:'Direct Bilirubin',category:'BIOCHEMISTRY',unit:'mg/dL',range:'0.0-0.3'},
+            {id:15,code:'ALT',name:'ALT (SGPT)',category:'BIOCHEMISTRY',unit:'U/L',range:'7-56'},
+            {id:16,code:'AST',name:'AST (SGOT)',category:'BIOCHEMISTRY',unit:'U/L',range:'10-40'},
+            {id:17,code:'ALP',name:'Alkaline Phosphatase',category:'BIOCHEMISTRY',unit:'U/L',range:'44-147'},
+            {id:18,code:'T-PROTEIN',name:'Total Protein',category:'BIOCHEMISTRY',unit:'g/dL',range:'6.0-8.3'},
+            {id:19,code:'ALBUMIN',name:'Albumin',category:'BIOCHEMISTRY',unit:'g/dL',range:'3.5-5.0'},
+            {id:20,code:'UREA',name:'Urea (BUN)',category:'BIOCHEMISTRY',unit:'mg/dL',range:'15-40'},
+            {id:21,code:'CREAT',name:'Creatinine',category:'BIOCHEMISTRY',unit:'mg/dL',range:'0.6-1.2'},
+            {id:22,code:'URIC-ACID',name:'Uric Acid',category:'BIOCHEMISTRY',unit:'mg/dL',range:'M:3.4-7.0 F:2.4-6.0'},
+            {id:23,code:'CHOL-T',name:'Total Cholesterol',category:'BIOCHEMISTRY',unit:'mg/dL',range:'<200'},
+            {id:24,code:'TRIG',name:'Triglycerides',category:'BIOCHEMISTRY',unit:'mg/dL',range:'<150'},
+            {id:25,code:'HDL',name:'HDL Cholesterol',category:'BIOCHEMISTRY',unit:'mg/dL',range:'>40 M, >50 F'},
+            {id:26,code:'LDL',name:'LDL Cholesterol',category:'BIOCHEMISTRY',unit:'mg/dL',range:'<100'},
+            {id:27,code:'VLDL',name:'VLDL',category:'BIOCHEMISTRY',unit:'mg/dL',range:'5-40'},
+            {id:28,code:'HBsAg',name:'HBsAg (Hepatitis B)',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:29,code:'ANTI-HCV',name:'Anti-HCV (Hepatitis C)',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:30,code:'HIV',name:'HIV (Anti-HIV)',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:31,code:'VDRL',name:'VDRL (Syphilis)',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:32,code:'H-PYLORI',name:'H. Pylori',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:33,code:'TB-IGG',name:'TB IgG',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:34,code:'WIDAL',name:'Widal Test',category:'SEROLOGY',unit:'',range:'1:20 to 1:320'},
+            {id:35,code:'TYPHIDOT',name:'Typhidot',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:36,code:'MALARIA',name:'Malaria Parasite',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:37,code:'DENGUE',name:'Dengue NS1/IgM',category:'SEROLOGY',unit:'',range:'Negative/Positive'},
+            {id:38,code:'TSH',name:'TSH',category:'ENDOCRINOLOGY',unit:'µIU/mL',range:'0.4-4.0'},
+            {id:39,code:'T3',name:'T3 (Total)',category:'ENDOCRINOLOGY',unit:'ng/dL',range:'80-200'},
+            {id:40,code:'T4',name:'T4 (Total)',category:'ENDOCRINOLOGY',unit:'µg/dL',range:'5.0-12.0'},
+            {id:41,code:'FT3',name:'Free T3',category:'ENDOCRINOLOGY',unit:'pg/mL',range:'2.3-4.2'},
+            {id:42,code:'FT4',name:'Free T4',category:'ENDOCRINOLOGY',unit:'ng/dL',range:'0.8-1.8'},
+            {id:43,code:'CRP',name:'CRP (Qualitative)',category:'IMMUNOLOGY',unit:'',range:'Negative/Positive'},
+            {id:44,code:'RA-FACTOR',name:'RA Factor',category:'IMMUNOLOGY',unit:'IU/mL',range:'<14'},
+            {id:45,code:'ASO',name:'ASO Titer',category:'IMMUNOLOGY',unit:'IU/mL',range:'<200'},
+            {id:46,code:'URINE-CE',name:'Urine C/E',category:'URINE',unit:'',range:'See Report'},
+            {id:47,code:'UPT',name:'Urine Pregnancy Test',category:'URINE',unit:'',range:'Negative/Positive'},
+            {id:48,code:'STOOL-CE',name:'Stool C/E',category:'STOOL',unit:'',range:'See Report'},
+            {id:49,code:'SEMEN',name:'Semen Analysis',category:'SEMEN',unit:'',range:'See Report'},
+        ];
+
+        function init() { loadSettings(); populateTestList(); loadReports(); }
+        function populateTestList() {
+            const testList = document.getElementById('testList');
+            testList.innerHTML = '';
+            let currentCategory = '';
+            testDatabase.forEach(test => {
+                if (test.category !== currentCategory) {
+                    currentCategory = test.category;
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.style.fontWeight = '600';
+                    categoryDiv.style.marginTop = '10px';
+                    categoryDiv.style.color = '#1565c0';
+                    categoryDiv.textContent = currentCategory;
+                    testList.appendChild(categoryDiv);
+                }
+                const item = document.createElement('div');
+                item.className = 'test-item';
+                item.innerHTML = `<input type="checkbox" id="test${test.id}" value="${test.id}"><label for="test${test.id}">${test.name} (${test.unit})</label>`;
+                testList.appendChild(item);
+            });
+        }
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            if (sectionId === 'viewReports') loadReports();
+        }
+        function createReport() {
+            const name = document.getElementById('patientName').value.trim();
+            const age = document.getElementById('patientAge').value;
+            const gender = document.getElementById('patientGender').value;
+            const phone = document.getElementById('patientPhone').value.trim();
+            const doctor = document.getElementById('patientDoctor').value.trim();
+            const labNumber = document.getElementById('labNumber').value.trim();
+            const selectedTests = Array.from(document.querySelectorAll('.test-item input:checked')).map(c => parseInt(c.value));
+            if (!name) { showAlert('Patient name is required!', 'error'); return; }
+            if (selectedTests.length === 0) { showAlert('Please select at least one test!', 'error'); return; }
+            const reportCode = generateReportCode();
+            const today = new Date();
+            const date = today.toLocaleDateString('en-GB');
+            const report = { id: Date.now(), code: reportCode, name, age: age || 'N/A', gender: gender || 'N/A', phone: phone || 'N/A', doctor: doctor || 'N/A', labNumber: labNumber || 'N/A', date, receiptDate: date, selectedTests, results: {}, createdAt: new Date().toISOString() };
+            selectedTests.forEach(testId => { report.results[testId] = { value: '', status: 'Normal' }; });
+            enterResults(report);
+        }
+        function enterResults(report) {
+            const selectedTests = report.selectedTests;
+            let html = `<h3>Enter Results for Report ${report.code}</h3><p><strong>Patient:</strong> ${report.name} | <strong>Age:</strong> ${report.age} | <strong>Gender:</strong> ${report.gender}</p>`;
+            selectedTests.forEach(testId => {
+                const test = testDatabase.find(t => t.id === testId);
+                if (test) {
+                    html += `<div class="form-group"><label>${test.name}</label><div style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 12px;"><strong>Range:</strong> ${test.range} | <strong>Unit:</strong> ${test.unit || 'N/A'}</div><input type="text" id="val_${testId}" placeholder="Enter value" style="margin-bottom: 8px;"><select id="status_${testId}"><option value="Normal">Normal</option><option value="Abnormal">Abnormal</option><option value="High">High</option><option value="Low">Low</option></select></div>`;
+                }
+            });
+            const modal = document.getElementById('reportModal');
+            const content = document.getElementById('reportContent');
+            content.innerHTML = html;
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'btn btn-success';
+            saveBtn.textContent = 'SAVE REPORT';
+            saveBtn.onclick = () => saveReport(report);
+            content.appendChild(saveBtn);
+            modal.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function saveReport(report) {
+            const selectedTests = report.selectedTests;
+            selectedTests.forEach(testId => {
+                const value = document.getElementById(`val_${testId}`).value.trim();
+                const status = document.getElementById(`status_${testId}`).value;
+                report.results[testId] = { value, status };
+            });
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            reports.push(report);
+            localStorage.setItem('reports', JSON.stringify(reports));
+            closeModal();
+            resetForm();
+            showAlert('Report saved successfully!', 'success');
+            setTimeout(() => showSection('viewReports'), 1000);
+        }
+        function generateReportCode() {
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const year = new Date().getFullYear();
+            const count = reports.filter(r => r.code.includes(year)).length + 1;
+            return `REP-${year}-${String(count).padStart(4, '0')}`;
+        }
+        function loadReports() {
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const reportsList = document.getElementById('reportsList');
+            if (reports.length === 0) { reportsList.innerHTML = '<div class="no-reports">No reports found. Create a new report to get started.</div>'; return; }
+            reportsList.innerHTML = reports.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(report => `<div class="report-item" onclick="viewReport(${report.id})"><div class="report-item-title">[${report.code}] ${report.name}</div><div class="report-item-info">Age: ${report.age} | Gender: ${report.gender} | Date: ${report.date} | Phone: ${report.phone}</div></div>`).join('');
+        }
+        function viewReport(reportId) {
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            if (!report) return;
+            let html = `<div class="report-preview"><div class="report-header"><h3>MALIK SURGICAL HOSPITAL</h3><h4>LABORATOR & DIAGNOSTIC CENTER</h4><p>Mandi Ahmadabad | Ph: +923207307162</p></div><div class="report-section"><h5>REPORT INFORMATION</h5><p><strong>Report Code:</strong> ${report.code}</p><p><strong>Lab Number:</strong> ${report.labNumber}</p><p><strong>Report Date:</strong> ${report.date}</p></div><div class="report-section"><h5>PATIENT INFORMATION</h5><p><strong>Name:</strong> ${report.name}</p><p><strong>Age:</strong> ${report.age}</p><p><strong>Gender:</strong> ${report.gender}</p><p><strong>Phone:</strong> ${report.phone}</p><p><strong>Doctor:</strong> ${report.doctor}</p></div><div class="report-section"><h5>TEST RESULTS</h5><table class="results-table"><thead><tr><th>Test Name</th><th>Value</th><th>Unit</th><th>Range</th><th>Status</th></tr></thead><tbody>`;
+            let currentCategory = '';
+            report.selectedTests.forEach(testId => {
+                const test = testDatabase.find(t => t.id === testId);
+                if (test) {
+                    if (test.category !== currentCategory) {
+                        currentCategory = test.category;
+                        html += `<tr><td colspan="5" style="background: #e3f2fd; font-weight: 600;">${test.category}</td></tr>`;
+                    }
+                    const result = report.results[testId];
+                    html += `<tr><td>${test.name}</td><td>${result.value || 'N/A'}</td><td>${test.unit}</td><td>${test.range}</td><td>${result.status}</td></tr>`;
+                }
+            });
+            html += `</tbody></table></div></div>`;
+            const modal = document.getElementById('reportModal');
+            const content = document.getElementById('reportContent');
+            content.innerHTML = html;
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'btn-group';
+            btnGroup.innerHTML = `<button class="btn btn-primary" onclick="printReport()">PRINT</button><button class="btn btn-danger" onclick="deleteReport(${reportId})">DELETE</button><button class="btn btn-secondary" onclick="closeModal()">CLOSE</button>`;
+            content.appendChild(btnGroup);
+            modal.classList.add('active');
+            window.scrollTo(0, 0);
+            window.currentReportId = reportId;
+        }
+        function deleteReport(reportId) {
+            if (confirm('Delete this report?')) {
+                let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+                reports = reports.filter(r => r.id !== reportId);
+                localStorage.setItem('reports', JSON.stringify(reports));
+                closeModal();
+                loadReports();
+                showAlert('Report deleted!', 'success');
+            }
+        }
+        function searchReports() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const filtered = reports.filter(r => r.name.toLowerCase().includes(searchTerm) || r.phone.toLowerCase().includes(searchTerm) || r.code.toLowerCase().includes(searchTerm));
+            const reportsList = document.getElementById('reportsList');
+            if (filtered.length === 0) { reportsList.innerHTML = '<div class="no-reports">No reports found.</div>'; return; }
+            reportsList.innerHTML = filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(report => `<div class="report-item" onclick="viewReport(${report.id})"><div class="report-item-title">[${report.code}] ${report.name}</div><div class="report-item-info">Age: ${report.age} | Gender: ${report.gender} | Date: ${report.date}</div></div>`).join('');
+        }
+        function printReport() { window.print(); }
+        function resetForm() {
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientAge').value = '';
+            document.getElementById('patientGender').value = '';
+            document.getElementById('patientPhone').value = '';
+            document.getElementById('patientDoctor').value = '';
+            document.getElementById('labNumber').value = '';
+            document.querySelectorAll('.test-item input').forEach(c => c.checked = false);
+        }
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('settings') || '{}');
+            document.getElementById('hospitalName').value = settings.hospitalName || 'MALIK SURGICAL HOSPITAL';
+            document.getElementById('hospitalAddress').value = settings.hospitalAddress || 'Mandi Ahmadabad';
+            document.getElementById('hospitalPhone1').value = settings.hospitalPhone1 || '+923207307162';
+            document.getElementById('hospitalPhone2').value = settings.hospitalPhone2 || '+923207307163';
+            document.getElementById('hospitalEmail').value = settings.hospitalEmail || 'drshahbazahmad0346@gmail.com';
+        }
+        function saveSettings() {
+            const settings = {
+                hospitalName: document.getElementById('hospitalName').value,
+                hospitalAddress: document.getElementById('hospitalAddress').value,
+                hospitalPhone1: document.getElementById('hospitalPhone1').value,
+                hospitalPhone2: document.getElementById('hospitalPhone2').value,
+                hospitalEmail: document.getElementById('hospitalEmail').value,
+            };
+            localStorage.setItem('settings', JSON.stringify(settings));
+            showAlert('Settings saved!', 'success');
+        }
+        function clearAllData() {
+            if (confirm('Delete ALL data? Cannot undo!')) {
+                localStorage.clear();
+                init();
+                showAlert('All data cleared!', 'success');
+            }
+        }
+        function closeModal() { document.getElementById('reportModal').classList.remove('active'); }
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.getElementById('reportAlert');
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => { alertDiv.innerHTML = ''; }, 3000);
+        }
+        window.addEventListener('load', init);
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('reportModal');
+            if (event.target === modal) modal.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
