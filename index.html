@@ -175,15 +175,20 @@
     .stat-num { font-size: 32px; font-weight: 800; color: #1a5276; }
     .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
 
+    /* ── LOGO UPLOAD ── */
+    .logo-preview {
+      width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;
+      border: 2px dashed #2e86c1; padding: 5px; border-radius: 6px;
+    }
+
     /* ── PRINT STYLES ── */
     @media print {
-      body * { visibility: hidden !important; }
-      #print-area, #print-area * { visibility: visible !important; }
-      #print-area {
-        position: fixed !important; top: 0 !important; left: 0 !important;
-        width: 100% !important; height: auto !important;
-      }
+      body { background: #fff; }
+      .navbar { display: none !important; }
+      .page { padding: 0 !important; max-width: 100% !important; }
       .no-print { display: none !important; }
+      #print-area { display: block !important; }
+      .rpt-page { box-shadow: none; }
     }
 
     /* ── PRINT REPORT LAYOUT ── */
@@ -193,41 +198,40 @@
       font-size: 11px;
       color: #000;
       background: #fff;
-      padding: 20px;
     }
     .rpt-page {
-      width: 210mm;
-      min-height: 297mm;
+      width: 100%;
+      max-width: 210mm;
       margin: 0 auto 20px;
-      padding: 10mm 12mm;
+      padding: 20px;
       background: #fff;
-      box-shadow: 0 0 0 1px #ddd;
+      page-break-after: always;
     }
     .rpt-header {
       display: flex; align-items: center;
-      border-bottom: 3px solid #1a5276; padding-bottom: 10px; margin-bottom: 10px;
+      border-bottom: 3px solid #1a5276; padding-bottom: 15px; margin-bottom: 15px;
     }
-    .rpt-logo { width: 70px; height: 70px; object-fit: contain; margin-right: 15px; }
+    .rpt-logo { width: 80px; height: 80px; object-fit: contain; margin-right: 20px; }
     .rpt-info h1 { font-size: 18px; font-weight: bold; color: #1a5276; margin: 0; }
-    .rpt-info p { margin: 2px 0; font-size: 11px; color: #555; }
+    .rpt-info p { margin: 3px 0; font-size: 11px; color: #555; }
     .rpt-meta {
       display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;
-      margin: 12px 0; font-size: 11px;
+      margin: 15px 0; font-size: 11px;
     }
     .rpt-meta-row { display: flex; gap: 8px; }
     .rpt-meta-label { font-weight: bold; min-width: 100px; }
     .rpt-meta-value { color: #333; }
     .rpt-table {
-      width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 11px;
+      width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px;
     }
     .rpt-table th {
-      background: #1a5276; color: #fff; padding: 6px 8px;
+      background: #1a5276; color: #fff; padding: 8px;
       text-align: left; font-weight: bold;
     }
-    .rpt-table td { padding: 5px 8px; border-bottom: 1px solid #ddd; }
+    .rpt-table td { padding: 6px 8px; border-bottom: 1px solid #ddd; }
     .rpt-table .section { background: #e67e22; color: #fff; font-weight: bold; }
     .rpt-footer {
-      border-top: 1px solid #1a5276; margin-top: 12px; padding-top: 8px;
+      border-top: 2px solid #1a5276; margin-top: 15px; padding-top: 10px;
       font-size: 10px; color: #666; text-align: center;
     }
     .alert { padding: 12px; border-radius: 6px; margin-bottom: 16px; }
@@ -394,6 +398,13 @@
 <div id="settings" class="page">
   <div class="card">
     <h2>Hospital Settings</h2>
+    
+    <div class="form-group">
+      <label>Hospital Logo (Upload Image)</label>
+      <input type="file" id="s-logo" accept="image/*" onchange="uploadLogo()">
+      <img id="logo-display" class="logo-preview" style="display:none;" alt="Hospital Logo">
+    </div>
+
     <div class="form-group">
       <label>Hospital Name</label>
       <input type="text" id="s-name" value="MALIK SURGICAL HOSPITAL">
@@ -514,9 +525,12 @@ function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
   if (pageId === 'dashboard') updateDashboard();
   if (pageId === 'reports') renderReports();
+  if (pageId === 'settings') loadSettings();
 }
 
 function saveToLocalStorage() {
@@ -750,15 +764,17 @@ function openReport(labNo) {
   const report = allReports.find(r => r.labNo === labNo);
   if (!report) return;
 
+  const logoUrl = localStorage.getItem('hospital_logo') || '';
+  const logoHtml = logoUrl ? `<img src="${logoUrl}" class="rpt-logo" alt="Hospital Logo">` : '';
+
   let html = `
     <div class="rpt-page">
       <div class="rpt-header">
-        <div>
-          <div class="rpt-info">
-            <h1>${localStorage.getItem('hospital_name') || 'MALIK SURGICAL HOSPITAL'}</h1>
-            <p>${localStorage.getItem('hospital_dept') || 'LABORATORY & DIAGNOSTIC CENTER'}</p>
-            <p style="font-size: 10px; color: #999;">${localStorage.getItem('hospital_address') || 'Address'}</p>
-          </div>
+        ${logoHtml}
+        <div class="rpt-info">
+          <h1>${localStorage.getItem('hospital_name') || 'MALIK SURGICAL HOSPITAL'}</h1>
+          <p>${localStorage.getItem('hospital_dept') || 'LABORATORY & DIAGNOSTIC CENTER'}</p>
+          <p style="font-size: 10px; color: #999;">${localStorage.getItem('hospital_address') || 'Address'}</p>
         </div>
       </div>
 
@@ -803,7 +819,7 @@ function openReport(labNo) {
   `;
 
   for (const [dept, tests] of Object.entries(report.selectedTests)) {
-    html += `<tr class="rpt-table"><td colspan="5" class="section">${dept}</td></tr>`;
+    html += `<tr><td colspan="5" class="section">${dept}</td></tr>`;
     tests.forEach(test => {
       const result = report.results[test];
       const testData = TEST_DATABASE[dept][test];
@@ -855,7 +871,37 @@ function shareWhatsApp() {
   window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`);
 }
 
+// ==================== LOGO UPLOAD ====================
+function uploadLogo() {
+  const fileInput = document.getElementById('s-logo');
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const logoUrl = e.target.result;
+    localStorage.setItem('hospital_logo', logoUrl);
+    document.getElementById('logo-display').src = logoUrl;
+    document.getElementById('logo-display').style.display = 'block';
+    alert('✅ Logo uploaded successfully!');
+  };
+  reader.readAsDataURL(file);
+}
+
 // ==================== SETTINGS ====================
+function loadSettings() {
+  document.getElementById('s-name').value = localStorage.getItem('hospital_name') || 'MALIK SURGICAL HOSPITAL';
+  document.getElementById('s-dept').value = localStorage.getItem('hospital_dept') || 'LABORATORY & DIAGNOSTIC CENTER';
+  document.getElementById('s-address').value = localStorage.getItem('hospital_address') || 'Hujra Baseerpur Road, Mandi Ahmad Abad';
+  document.getElementById('s-footer').value = localStorage.getItem('hospital_footer') || 'Digitally verified report. Does not require signature.';
+  
+  const logoUrl = localStorage.getItem('hospital_logo');
+  if (logoUrl) {
+    document.getElementById('logo-display').src = logoUrl;
+    document.getElementById('logo-display').style.display = 'block';
+  }
+}
+
 function saveSettings() {
   localStorage.setItem('hospital_name', document.getElementById('s-name').value);
   localStorage.setItem('hospital_dept', document.getElementById('s-dept').value);
@@ -892,12 +938,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadTestSelection();
   updateDashboard();
-
-  // Load settings
-  document.getElementById('s-name').value = localStorage.getItem('hospital_name') || 'MALIK SURGICAL HOSPITAL';
-  document.getElementById('s-dept').value = localStorage.getItem('hospital_dept') || 'LABORATORY & DIAGNOSTIC CENTER';
-  document.getElementById('s-address').value = localStorage.getItem('hospital_address') || 'Hujra Baseerpur Road, Mandi Ahmad Abad';
-  document.getElementById('s-footer').value = localStorage.getItem('hospital_footer') || 'Digitally verified report. Does not require signature.';
+  loadSettings();
 });
 </script>
 
