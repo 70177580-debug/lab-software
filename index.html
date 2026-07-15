@@ -7,6 +7,7 @@
   <style>
     /* ── GLOBAL ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #222; line-height: 1.5; }
 
     /* ── NAVBAR ── */
@@ -181,16 +182,6 @@
       border: 2px dashed #2e86c1; padding: 5px; border-radius: 6px;
     }
 
-    /* ── PRINT STYLES ── */
-    @media print {
-      body { background: #fff; }
-      .navbar { display: none !important; }
-      .page { padding: 0 !important; max-width: 100% !important; }
-      .no-print { display: none !important; }
-      #print-area { display: block !important; }
-      .rpt-page { box-shadow: none; }
-    }
-
     /* ── PRINT REPORT LAYOUT ── */
     #print-area {
       display: none;
@@ -198,14 +189,17 @@
       font-size: 11px;
       color: #000;
       background: #fff;
+      padding: 0;
+      margin: 0;
     }
     .rpt-page {
       width: 100%;
       max-width: 210mm;
-      margin: 0 auto 20px;
+      margin: 0 auto;
       padding: 20px;
       background: #fff;
       page-break-after: always;
+      page-break-inside: avoid;
     }
     .rpt-header {
       display: flex; align-items: center;
@@ -237,6 +231,20 @@
     .alert { padding: 12px; border-radius: 6px; margin-bottom: 16px; }
     .alert-info { background: #d6eaf8; border-left: 4px solid #1a5276; color: #1a5276; }
     .alert-danger { background: #fadbd8; border-left: 4px solid #c0392b; color: #c0392b; }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+      html, body { margin: 0; padding: 0; background: #fff; }
+      .navbar { display: none !important; }
+      .page { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+      .no-print { display: none !important; }
+      .card { box-shadow: none; border: none; padding: 0; margin: 0; }
+      #print-area { display: block !important; margin: 0; padding: 0; }
+      .rpt-page { box-shadow: none; margin: 0; }
+      .rpt-header { display: flex; align-items: center; }
+      .rpt-table { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -365,6 +373,7 @@
   </div>
 
   <div class="card btn-row">
+    <button class="btn btn-warning" onclick="previewAndPrint()">🖨️ Print / Preview First</button>
     <button class="btn btn-success" onclick="saveReport()">💾 Save Report</button>
     <button class="btn btn-secondary" onclick="showPage('new-report')">← Back</button>
   </div>
@@ -388,7 +397,7 @@
     <div class="btn-row">
       <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
       <button class="btn btn-whatsapp" onclick="shareWhatsApp()">📱 Share WhatsApp</button>
-      <button class="btn btn-secondary" onclick="showPage('reports')">← Back</button>
+      <button class="btn btn-secondary" onclick="goBackToPrint()">← Back</button>
     </div>
   </div>
   <div id="print-area"></div>
@@ -508,6 +517,7 @@ const TEST_DATABASE = {
 // ==================== DATA & STATE ====================
 let currentReport = {};
 let allReports = JSON.parse(localStorage.getItem('labReports')) || [];
+let printSource = 'enter-results'; // Track where we came from
 
 // ==================== UTILITY FUNCTIONS ====================
 function generateLabNo() {
@@ -694,6 +704,28 @@ function renderResultsEntry() {
   document.getElementById('results-sections').innerHTML = html;
 }
 
+// ==================== PREVIEW & PRINT BEFORE SAVING ====================
+function previewAndPrint() {
+  const results = {};
+  document.querySelectorAll('.result-input').forEach(input => {
+    const test = input.dataset.test;
+    const value = input.value;
+    const flag = document.querySelector(`select[data-test="${test}"]`).value;
+    if (value) {
+      results[test] = { value, flag };
+    }
+  });
+
+  currentReport.results = results;
+  generateReportHTML();
+  printSource = 'enter-results';
+  showPage('print-page');
+}
+
+function goBackToPrint() {
+  showPage(printSource);
+}
+
 // ==================== SAVE REPORT ====================
 function saveReport() {
   const results = {};
@@ -760,10 +792,8 @@ function renderReports() {
   document.getElementById('reports-list').innerHTML = html;
 }
 
-function openReport(labNo) {
-  const report = allReports.find(r => r.labNo === labNo);
-  if (!report) return;
-
+function generateReportHTML() {
+  const report = currentReport;
   const logoUrl = localStorage.getItem('hospital_logo') || '';
   const logoHtml = logoUrl ? `<img src="${logoUrl}" class="rpt-logo" alt="Hospital Logo">` : '';
 
@@ -823,14 +853,16 @@ function openReport(labNo) {
     tests.forEach(test => {
       const result = report.results[test];
       const testData = TEST_DATABASE[dept][test];
-      const flagClass = result.flag === 'H' ? 'flag-H' : result.flag === 'L' ? 'flag-L' : 'flag-N';
+      const resultValue = result ? result.value : '';
+      const resultFlag = result ? result.flag : 'N';
+      const flagClass = resultFlag === 'H' ? 'flag-H' : resultFlag === 'L' ? 'flag-L' : 'flag-N';
       html += `
         <tr>
           <td>${test}</td>
-          <td><strong>${result.value}</strong></td>
+          <td><strong>${resultValue}</strong></td>
           <td>${testData.unit}</td>
           <td>${testData.range}</td>
-          <td class="${flagClass}">${result.flag}</td>
+          <td class="${flagClass}">${resultFlag}</td>
         </tr>
       `;
     });
@@ -848,6 +880,15 @@ function openReport(labNo) {
   `;
 
   document.getElementById('print-area').innerHTML = html;
+}
+
+function openReport(labNo) {
+  const report = allReports.find(r => r.labNo === labNo);
+  if (!report) return;
+
+  currentReport = report;
+  generateReportHTML();
+  printSource = 'reports';
   showPage('print-page');
 }
 
@@ -860,7 +901,7 @@ function deleteReport(labNo) {
 }
 
 function shareWhatsApp() {
-  const report = allReports[allReports.length - 1];
+  const report = currentReport;
   if (!report) return;
   const msg = `Hello, please find the lab report for ${report.patientName} (Lab No: ${report.labNo}) attached.`;
   const phone = report.phone;
