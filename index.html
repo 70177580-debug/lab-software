@@ -432,76 +432,149 @@
 <script>
 // ==================== TEST DATABASE ====================
 const TEST_DATABASE = {
-  "Hematology": {
-    "Hemoglobin (Hb)": { range: "13.5-17.5 g/dL (M) / 12.0-15.5 g/dL (F)", unit: "g/dL" },
-    "RBC": { range: "4.5-5.5 million/μL (M) / 4.0-5.0 million/μL (F)", unit: "million/μL" },
-    "WBC": { range: "4.5-11.0 × 10³/μL", unit: "× 10³/μL" },
-    "Platelet Count": { range: "150-400 × 10³/μL", unit: "× 10³/μL" },
-    "MCV": { range: "80-100 fL", unit: "fL" },
-    "Hematocrit (Hct)": { range: "40.7-50.3% (M) / 36.1-44.3% (F)", unit: "%" },
-    "ESR": { range: "0-20 mm/hr", unit: "mm/hr" }
+  "BLOOD C/E": {
+    "HB%": { range: "13.5-17.5 (M) / 12.0-15.5 (F)", unit: "g/dL" },
+    "Blood Group": { range: "A / B / AB / O", unit: "Group" },
+    "Rh Factor": { range: "Positive / Negative", unit: "Qualitative" },
+    "Blood Sugar Fasting": { range: "70-99", unit: "mg/dL" },
+    "Blood Sugar Random": { range: "70-140", unit: "mg/dL" },
+    "L.f.t": { range: "Panel based (see LFT section)", unit: "Profile" },
+    "Cross Match": { range: "Compatible", unit: "Qualitative" },
+    "RFTs": { range: "Panel based (see RFT section)", unit: "Profile" },
+    "HbA1C": { range: "4.0-5.6", unit: "%" },
+    "Lipid Profile": { range: "Panel based (see Lipid Profile section)", unit: "Profile" },
+    "CHOLESTROL": { range: "Up to 200", unit: "mg/dL" },
+    "Triglycerides": { range: "Up to 150", unit: "mg/dL" },
+    "URIC ACID": { range: "3.4-7.0 (M) / 2.4-6.0 (F)", unit: "mg/dL" },
+    "R.A Factor": { range: "Negative / <14", unit: "IU/mL" },
+    "ASO TITER": { range: "Up to 200", unit: "IU/mL" },
+    "CRP": { range: "Up to 6", unit: "mg/L" },
+    "M.P TEST": { range: "Negative", unit: "Qualitative" },
+    "Typhidot IgG": { range: "Negative", unit: "Qualitative" },
+    "Typhidot IgM": { range: "Negative", unit: "Qualitative" },
+    "Cardiac Enzyme": { range: "Panel based (see Cardiac Enzymes section)", unit: "Profile" },
+    "S/Electrolytes": { range: "Panel based (Na/K/Cl)", unit: "Profile" },
+    "S/Calcium": { range: "8.5-10.5", unit: "mg/dL" },
+    "S/Amylases": { range: "30-110", unit: "U/L" },
+    "PT": { range: "11-13.5", unit: "seconds" },
+    "APTT": { range: "25-35", unit: "seconds" }
   },
-  "Biochemistry": {
-    "Blood Glucose (Fasting)": { range: "70-100 mg/dL", unit: "mg/dL" },
-    "Blood Glucose (Random)": { range: "<140 mg/dL", unit: "mg/dL" },
-    "Urea": { range: "15-45 mg/dL", unit: "mg/dL" },
-    "Creatinine": { range: "0.6-1.2 mg/dL", unit: "mg/dL" },
-    "Sodium": { range: "135-145 mEq/L", unit: "mEq/L" },
-    "Potassium": { range: "3.5-5.0 mEq/L", unit: "mEq/L" },
-    "Chloride": { range: "96-106 mEq/L", unit: "mEq/L" },
-    "Total Protein": { range: "6.0-8.3 g/dL", unit: "g/dL" },
-    "Albumin": { range: "3.4-5.4 g/dL", unit: "g/dL" },
-    "Bilirubin (Total)": { range: "0.3-1.2 mg/dL", unit: "mg/dL" },
-    "ALT (SGPT)": { range: "7-56 U/L", unit: "U/L" },
-    "AST (SGOT)": { range: "10-40 U/L", unit: "U/L" },
-    "ALP": { range: "30-120 U/L", unit: "U/L" },
-    "GGT": { range: "0-65 U/L", unit: "U/L" },
-    "Total Cholesterol": { range: "<200 mg/dL (Desirable)", unit: "mg/dL" },
-    "Triglycerides": { range: "<150 mg/dL", unit: "mg/dL" },
-    "HDL Cholesterol": { range: ">40 mg/dL (M) / >50 mg/dL (F)", unit: "mg/dL" },
-    "LDL Cholesterol": { range: "<100 mg/dL", unit: "mg/dL" }
+  "URINE C/E": {
+    "Color": { range: "Pale yellow to amber", unit: "Qualitative" },
+    "Appearance": { range: "Clear", unit: "Qualitative" },
+    "Specific Gravity": { range: "1.005-1.030", unit: "Ratio" },
+    "pH": { range: "4.5-8.0", unit: "pH" },
+    "Protein": { range: "Negative / Trace", unit: "Qualitative" },
+    "Sugar (Glucose)": { range: "Negative", unit: "Qualitative" },
+    "Ketone Bodies": { range: "Negative", unit: "Qualitative" },
+    "Bile Salts": { range: "Negative", unit: "Qualitative" },
+    "Bile Pigments": { range: "Negative", unit: "Qualitative" },
+    "Urobilinogen": { range: "0.1-1.0", unit: "EU/dL" },
+    "Pus Cells": { range: "0-5", unit: "/HPF" },
+    "RBC": { range: "0-3", unit: "/HPF" },
+    "Epithelial Cells": { range: "0-5", unit: "/HPF" },
+    "Casts": { range: "Nil / Occasional hyaline", unit: "/LPF" },
+    "Crystals": { range: "Nil / Few", unit: "/HPF" },
+    "Bacteria": { range: "Nil", unit: "Qualitative" },
+    "Urine for Pregnancy Test": { range: "Negative", unit: "Qualitative" },
+    "HbsAg": { range: "Negative", unit: "Qualitative" },
+    "Anti HCV": { range: "Negative", unit: "Qualitative" },
+    "HIV(Aids) 1&2": { range: "Negative", unit: "Qualitative" },
+    "V.D.R.L": { range: "Non-Reactive", unit: "Qualitative" },
+    "H.Pylori": { range: "Negative", unit: "Qualitative" },
+    "Mycodot": { range: "Negative", unit: "Qualitative" },
+    "Sputum ABF": { range: "Negative", unit: "Qualitative" }
   },
-  "Coagulation": {
-    "PT/INR": { range: "11-13.5 seconds / 0.8-1.1", unit: "sec / ratio" },
-    "aPTT": { range: "25-35 seconds", unit: "seconds" },
-    "Fibrinogen": { range: "200-400 mg/dL", unit: "mg/dL" }
+  "CBC": {
+    "Hemoglobin": { range: "13.5-17.5 (M) / 12.0-15.5 (F)", unit: "g/dL" },
+    "Total RBC Count": { range: "4.5-5.9 (M) / 4.1-5.1 (F)", unit: "million/µL" },
+    "Total WBC Count": { range: "4.0-11.0", unit: "×10³/µL" },
+    "Platelet Count": { range: "150-450", unit: "×10³/µL" },
+    "Hematocrit (PCV)": { range: "40-54 (M) / 36-48 (F)", unit: "%" },
+    "MCV": { range: "80-100", unit: "fL" },
+    "MCH": { range: "27-33", unit: "pg" },
+    "MCHC": { range: "32-36", unit: "g/dL" },
+    "RDW": { range: "11.5-14.5", unit: "%" },
+    "Neutrophils": { range: "40-75", unit: "%" },
+    "Lymphocytes": { range: "20-45", unit: "%" },
+    "Monocytes": { range: "2-10", unit: "%" },
+    "Eosinophils": { range: "1-6", unit: "%" },
+    "Basophils": { range: "0-1", unit: "%" },
+    "ESR": { range: "0-20", unit: "mm/hr" }
   },
-  "Immunology": {
-    "HIV Antibody": { range: "Negative", unit: "Qualitative" },
+  "CBC THQ": {
+    "Hb": { range: "13.5-17.5 (M) / 12.0-15.5 (F)", unit: "g/dL" },
+    "TLC": { range: "4.0-11.0", unit: "×10³/µL" },
+    "DLC (N/L/M/E/B)": { range: "N 40-75, L 20-45, M 2-10, E 1-6, B 0-1", unit: "%" },
+    "Platelets": { range: "150-450", unit: "×10³/µL" },
+    "HCT": { range: "40-54 (M) / 36-48 (F)", unit: "%" },
+    "QBC": { range: "Within reference", unit: "Qualitative" }
+  },
+  "Lipid Profile": {
+    "Cholesterol": { range: "Up to 200", unit: "mg/dL" },
+    "Triglycerides": { range: "Up to 150", unit: "mg/dL" },
+    "HDL cholesterol": { range: "35-55", unit: "mg/dL" },
+    "LDL cholesterol": { range: "Up to 150", unit: "mg/dL" },
+    "VLDL cholesterol": { range: "5-40", unit: "mg/dL" }
+  },
+  "CARDIAC ENZYMES": {
+    "CPK": { range: "24-170", unit: "U/L" },
+    "CK MB": { range: "0-25", unit: "U/L" },
+    "LDH (Serum)": { range: "230-460", unit: "U/L" },
+    "SGOT": { range: "5-40", unit: "U/L" },
+    "Troponin-I": { range: "Negative / <0.04", unit: "ng/mL" }
+  },
+  "LFT": {
+    "Bilirubin Total": { range: "0.3-1.2", unit: "mg/dL" },
+    "Bilirubin Direct": { range: "0.0-0.3", unit: "mg/dL" },
+    "Bilirubin Indirect": { range: "0.2-0.9", unit: "mg/dL" },
+    "ALT (SGPT)": { range: "7-56", unit: "U/L" },
+    "AST (SGOT)": { range: "10-40", unit: "U/L" },
+    "Alkaline Phosphatase": { range: "30-120", unit: "U/L" },
+    "Total Protein": { range: "6.0-8.3", unit: "g/dL" },
+    "Albumin": { range: "3.5-5.2", unit: "g/dL" },
+    "Globulin": { range: "2.0-3.5", unit: "g/dL" }
+  },
+  "RFT": {
+    "Blood Urea": { range: "15-45", unit: "mg/dL" },
+    "Serum Creatinine": { range: "0.6-1.2", unit: "mg/dL" },
+    "Uric Acid": { range: "3.4-7.0 (M) / 2.4-6.0 (F)", unit: "mg/dL" },
+    "Sodium": { range: "135-145", unit: "mEq/L" },
+    "Potassium": { range: "3.5-5.0", unit: "mEq/L" },
+    "Chloride": { range: "98-106", unit: "mEq/L" },
+    "Bicarbonate": { range: "22-29", unit: "mEq/L" }
+  },
+  "Hepatitis": {
     "HBsAg": { range: "Negative", unit: "Qualitative" },
     "Anti-HCV": { range: "Negative", unit: "Qualitative" },
-    "Venereal Disease Research Lab (VDRL)": { range: "Non-Reactive", unit: "Qualitative" },
-    "ABO Blood Group": { range: "O, A, B, AB", unit: "Group" },
-    "Rh Factor": { range: "Positive / Negative", unit: "Qualitative" }
-  },
-  "Urinalysis": {
-    "Appearance": { range: "Clear", unit: "Qualitative" },
-    "Color": { range: "Pale to Dark Yellow", unit: "Qualitative" },
-    "pH": { range: "4.5-8.0", unit: "pH" },
-    "Specific Gravity": { range: "1.005-1.030", unit: "g/mL" },
-    "Protein": { range: "Negative / Trace", unit: "mg/dL" },
-    "Glucose": { range: "Negative", unit: "Qualitative" },
-    "Ketones": { range: "Negative", unit: "Qualitative" },
-    "Leukocyte Esterase": { range: "Negative", unit: "Qualitative" },
-    "Nitrites": { range: "Negative", unit: "Qualitative" },
-    "RBC": { range: "0-3 /hpf", unit: "/hpf" },
-    "WBC": { range: "0-5 /hpf", unit: "/hpf" },
-    "Bacteria": { range: "Negative", unit: "Qualitative" },
-    "Crystals": { range: "Negative / Few", unit: "Qualitative" }
-  },
-  "Hormones": {
-    "TSH": { range: "0.4-4.0 mIU/L", unit: "mIU/L" },
-    "Free T3": { range: "2.3-4.2 pg/mL", unit: "pg/mL" },
-    "Free T4": { range: "0.8-1.8 ng/dL", unit: "ng/dL" },
-    "Prolactin": { range: "4.6-21.4 ng/mL (F) / 2.1-17.7 ng/mL (M)", unit: "ng/mL" },
-    "Testosterone": { range: "264-916 ng/dL (M) / 15-70 ng/dL (F)", unit: "ng/dL" }
-  },
-  "Serology": {
-    "Widal Test (Typhi O)": { range: "Negative / <1:80", unit: "Titer" },
-    "Widal Test (Typhi H)": { range: "Negative / <1:80", unit: "Titer" },
-    "Widal Test (Paratyphi A)": { range: "Negative / <1:80", unit: "Titer" },
     "Hepatitis A IgM": { range: "Negative", unit: "Qualitative" },
     "Hepatitis E IgM": { range: "Negative", unit: "Qualitative" }
+  },
+  "H.Pylori": {
+    "H.Pylori IgG": { range: "Negative", unit: "Qualitative" },
+    "H.Pylori IgM": { range: "Negative", unit: "Qualitative" },
+    "H.Pylori Antigen": { range: "Negative", unit: "Qualitative" }
+  },
+  "H Pylori stool": {
+    "H.Pylori Stool Antigen": { range: "Negative", unit: "Qualitative" }
+  },
+  "stool c/e": {
+    "Color": { range: "Brown", unit: "Qualitative" },
+    "Consistency": { range: "Soft / Formed", unit: "Qualitative" },
+    "Occult Blood": { range: "Negative", unit: "Qualitative" },
+    "Mucus": { range: "Absent", unit: "Qualitative" },
+    "RBC": { range: "0-2", unit: "/HPF" },
+    "Pus Cells": { range: "0-5", unit: "/HPF" },
+    "Ova / Cyst / Parasites": { range: "Not Seen", unit: "Qualitative" }
+  },
+  "semen Analysis": {
+    "Volume": { range: "1.5-6.5", unit: "mL" },
+    "Liquefaction Time": { range: "20-30", unit: "min" },
+    "pH": { range: "7.2-8.0", unit: "pH" },
+    "Sperm Count": { range: "15-200", unit: "million/mL" },
+    "Progressive Motility": { range: "≥32", unit: "%" },
+    "Normal Morphology": { range: "≥4", unit: "%" },
+    "Pus Cells": { range: "0-5", unit: "/HPF" }
   }
 };
 
